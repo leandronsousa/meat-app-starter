@@ -1,14 +1,20 @@
 import { Response, Request } from "express";
+import { User, users } from "./users";
 
 export const handleAuthentication = (req: Request, resp: Response) => {
     const user = req.body;
     if (isValid(user)) {
-        
+        const dbUser : User = users[user.email];
+        resp.json({name: dbUser.name, email: dbUser.email});
     } else {
         resp.status(403).json({message: 'Dados inválidos!'})
     }
 }
 
 function isValid(user): boolean {
-    return false;
+    if (!user) {
+        return false;
+    }
+    const dbUser = users[user.email]
+    return dbUser != undefined && dbUser.matches(user);
 }
