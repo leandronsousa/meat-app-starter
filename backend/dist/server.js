@@ -1,6 +1,7 @@
 "use strict";
 exports.__esModule = true;
 var auth_1 = require("./auth");
+var authz_1 = require("./authz");
 var fs = require("fs");
 var https = require("https");
 var jsonServer = require('json-server');
@@ -13,6 +14,7 @@ server.use(middlewares);
 // You can use the one used by JSON Server
 server.use(jsonServer.bodyParser);
 server.post('/login', auth_1.handleAuthentication);
+server.use('/orders', authz_1.handleAuthorization);
 // Use default router
 server.use(router);
 var options = {
