@@ -9,6 +9,11 @@ import { RestaurantService } from "app/restaurants/restaurants.service";
 import { OrderService } from "app/order/order.service";
 import { SnackbarComponent } from 'app/shared/messages/snackbar/snackbar.component';
 import { NotificationService } from "./messages/notification.service";
+import { LoginService } from "../security/login/login.service";
+import { LoggedInGuard } from "app/security/loggedin.guard";
+import { LeaveOrderGuard } from "app/order/leave-order.guard";
+import { HTTP_INTERCEPTORS } from "@angular/common/http";
+import { AuthInterceptor } from "app/security/auth.interceptor";
 
 /**
  * Modulo compartilhado onde fica os componentes da aplicacao que podem 
@@ -28,7 +33,9 @@ export class SharedModule {
         return {
             ngModule: SharedModule,
             providers: [ShoppingCartService, RestaurantService, 
-                OrderService, NotificationService]
+                OrderService, NotificationService, LoginService,
+                LoggedInGuard, LeaveOrderGuard, 
+                {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}]
         }
     }
 }
