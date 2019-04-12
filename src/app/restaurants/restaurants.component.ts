@@ -1,15 +1,15 @@
+
+import { from } from 'rxjs';
+
+import {catchError, 
+      debounceTime, //tempo que o ajax espera para ser chamado
+      distinctUntilChanged, //nao busca se o termo nao foi alterado
+      switchMap} from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { Restaurant } from './restaurant/restaurant.model';
 import { RestaurantService } from './restaurants.service';
 import {trigger, state, style, transition, animate} from '@angular/animations';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
-
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/distinctUntilChanged';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/from';
 
 @Component({
   selector: 'mt-restaurants',
@@ -49,13 +49,15 @@ export class RestaurantsComponent implements OnInit {
       searchControl: this.searchControl
     });
 
-    this.searchControl.valueChanges.
-      debounceTime(500).//tempo que o ajax espera para ser chamado
-      distinctUntilChanged().//nao busca se o termo nao foi alterado
+    this.searchControl.valueChanges.pipe(
+      debounceTime(500),//tempo que o ajax espera para ser chamado
+      distinctUntilChanged(),//nao busca se o termo nao foi alterado
       switchMap(searchTerm => 
-        this.restaurantService.restaurants(searchTerm)
-        .catch(error => Observable.from([])))
-        .subscribe(restaurants =>this.restaurants = restaurants);
+        this.restaurantService.restaurants(searchTerm).pipe(
+          catchError(error => from([]))
+        )
+      )
+     ).subscribe(restaurants =>this.restaurants = restaurants);
 
     this.restaurantService.restaurants().subscribe(restaurants  => this.restaurants = restaurants);
   }
